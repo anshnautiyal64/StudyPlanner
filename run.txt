@@ -1,0 +1,9 @@
+cd vsls:/studyplaner
+g++ -std=c++17 -Wall main.cpp Graph.cpp KahnAlgo.cpp utils.cpp -o studyplanner
+g++ -std=c++17 -Wall test_study_planner.cpp Graph.cpp KahnAlgo.cpp -o test
+
+# Run tests
+./test
+
+# Run app
+./studyplanner
