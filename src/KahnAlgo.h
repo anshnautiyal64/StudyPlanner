@@ -6,9 +6,13 @@
 #include <string>
 
 using namespace std;
+
 struct TopoResult {
     bool hasCycle;
     vector<string> order;
+    vector<string> cyclePath; 
+    vector<string> criticalPath;
+    int maxCredits; 
 };
 
 TopoResult runKahnTopologicalSort(const Graph &graph);

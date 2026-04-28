@@ -1,41 +1,20 @@
-# Prerequisites
-*.d
+# Node.js
+node_modules/
+package-lock.json
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Linker files
-*.ilk
-
-# Debugger Files
-*.pdb
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
+# Compiled executables
 *.exe
-*.out
-*.app
 
-# debug information files
-*.dwo
+# VS Code settings
+.vscode/
+
+# Test files
+run.txt
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary scripts
+strip.js
+strip.py

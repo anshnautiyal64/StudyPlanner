@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Study Planner</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    .credit-input {
+      width: 100px;
+      margin-left: 10px;
+    }
+    .pair-row-subject {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .pair-row-subject input[type="text"] {
+      flex: 1;
+    }
+    .cp-highlight {
+        color: #3b82f6;
+        font-weight: 600;
+    }
+    .cycle-highlight {
+        color: #ef4444; 
+        font-weight: 600;
+    }
+    .weekly-plan-card {
+        margin-bottom: 16px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        padding: 16px;
+    }
+    .week-header {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 12px;
+        color: #fff;
+        display: flex;
+        justify-content: space-between;
+    }
+    .week-progress-bar-container {
+        width: 100%;
+        height: 8px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+        margin-bottom: 12px;
+        overflow: hidden;
+    }
+    .week-progress-bar {
+        height: 100%;
+        border-radius: 4px;
+        transition: width 0.3s ease;
+    }
+    .bg-green { background-color: #10b981; }
+    .bg-orange { background-color: #f59e0b; }
+    .bg-red { background-color: #ef4444; }
+
+    .week-subjects {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    
+    .path-arrow {
+        margin: 0 8px;
+        color: #64748b;
+        font-weight: bold;
+    }
+    
+    .critical-path-container {
+        margin-top: 24px;
+        padding: 16px;
+        background: rgba(59, 130, 246, 0.1);
+        border: 1px solid rgba(59, 130, 246, 0.3);
+        border-radius: 8px;
+    }
+    
+    .cp-title {
+        font-size: 15px;
+        font-weight: 600;
+        color: #60a5fa; 
+        margin-bottom: 8px;
+    }
+
+    .cp-path {
+        font-size: 14px;
+        line-height: 1.6;
+        color: #e2e8f0;
+    }
+
+    .cycle-path-container {
+        margin-top: 12px;
+        padding: 12px;
+        background: rgba(239, 68, 68, 0.15);
+        border: 1px solid rgba(239, 68, 68, 0.4);
+        border-radius: 6px;
+    }
+    .cycle-title {
+        color: #f87171;
+        font-weight: bold;
+        margin-bottom: 6px;
+    }
+    .cycle-path {
+        font-size: 14px;
+        line-height: 1.6;
+        color: #fca5a5;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div class="logo">
+        <div class="logo-icon">📚</div>
+        <div>
+          <div class="logo-title">Study Planner</div>
+          <div class="logo-sub">Prerequisite-aware scheduling</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- LEFT: Input -->
+    <aside class="sidebar">
+      <div class="card">
+        <div class="card-title">Examples</div>
+        <div class="example-grid">
+          <button class="example-btn" onclick="runTest(1)">
+            <span class="ex-icon">🔗</span>
+            <span class="ex-label">Linear Chain</span>
+          </button>
+          <button class="example-btn" onclick="runTest(2)">
+            <span class="ex-icon">🔀</span>
+            <span class="ex-label">Multiple Paths</span>
+          </button>
+          <button class="example-btn" onclick="runTest(3)">
+            <span class="ex-icon">🔄</span>
+            <span class="ex-label">Cycle Error</span>
+          </button>
+          <button class="example-btn" onclick="runTest(4)">
+            <span class="ex-icon">🌐</span>
+            <span class="ex-label">Disconnected</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Custom Input</div>
+
+        <!-- Step 1: number of subjects -->
+        <div class="wizard-step" id="step1">
+          <div class="step-header">
+            <div class="step-badge">1</div>
+            <span>How many subjects?</span>
+          </div>
+          <div class="step-body">
+            <input type="number" id="numSubjects" min="1" max="20" placeholder="e.g. 4" />
+            <button class="btn-next" onclick="goStep2()">Next →</button>
+          </div>
+        </div>
+
+        <!-- Step 2: subject names and credits -->
+        <div class="wizard-step locked" id="step2">
+          <div class="step-header">
+            <div class="step-badge">2</div>
+            <span>Enter subjects & credits</span>
+          </div>
+          <div class="step-body" id="subjectFields"></div>
+          <button class="btn-next" id="step2Next" onclick="goStep3()" style="display:none">Next →</button>
+        </div>
+
+        <!-- Step 3: max credits per week -->
+        <div class="wizard-step locked" id="step3">
+          <div class="step-header">
+            <div class="step-badge">3</div>
+            <span>Max credits per week?</span>
+          </div>
+          <div class="step-body">
+            <input type="number" id="maxCreditsWeek" min="1" placeholder="e.g. 10" value="10" />
+            <button class="btn-next" onclick="goStep4()">Next →</button>
+          </div>
+        </div>
+
+        <!-- Step 4: number of prerequisites -->
+        <div class="wizard-step locked" id="step4">
+          <div class="step-header">
+            <div class="step-badge">4</div>
+            <span>How many prerequisites?</span>
+          </div>
+          <div class="step-body">
+            <input type="number" id="numEdges" min="0" placeholder="e.g. 3" />
+            <button class="btn-next" onclick="goStep5()">Next →</button>
+          </div>
+        </div>
+
+        <!-- Step 5: prerequisite pairs -->
+        <div class="wizard-step locked" id="step5">
+          <div class="step-header">
+            <div class="step-badge">5</div>
+            <span>Enter prerequisite pairs</span>
+          </div>
+          <div class="step-body" id="edgeFields"></div>
+          <button class="btn-generate" id="generateBtn" onclick="runWizard()" style="display:none">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+            Generate Study Order
+          </button>
+        </div>
+
+        <button class="btn-clear" onclick="clearAll()">Start Over</button>
+      </div>
+    </aside>
+
+    <!-- RIGHT: Output -->
+    <section class="output">
+      <!-- Empty state -->
+      <div id="emptyState" class="empty-state">
+        <div class="empty-graphic">
+          <div class="eg-node">Math(3)</div>
+          <div class="eg-arrow">→</div>
+          <div class="eg-node">Physics(4)</div>
+          <div class="eg-arrow">→</div>
+          <div class="eg-node">Chemistry(4)</div>
+        </div>
+        <div class="empty-title">No plan yet</div>
+        <div class="empty-desc">Pick an example or enter your own subjects and prerequisites to generate a complete weekly study plan.</div>
+      </div>
+
+      <!-- Result -->
+      <div id="resultArea" style="display:none">
+
+        <!-- Status banner -->
+        <div id="statusBanner" class="status-banner"></div>
+
+        <!-- Error -->
+        <div id="errorBox" class="error-box" style="display:none">
+          <div class="error-header">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            What went wrong
+          </div>
+          <div id="errorMsg" class="error-msg"></div>
+          <div id="cycleBox" class="cycle-path-container" style="display:none">
+              <div class="cycle-title">Circular Dependency Detected:</div>
+              <div id="cyclePath" class="cycle-path"></div>
+          </div>
+        </div>
+
+        <!-- Graph -->
+        <div class="result-card graph-card">
+          <div class="rc-title">Dependency Graph</div>
+          <canvas id="graphCanvas"></canvas>
+        </div>
+
+        <!-- Two-col: recap + order -->
+        <div class="result-grid">
+          <!-- Input recap -->
+          <div class="result-card">
+            <div class="rc-title">Input Summary</div>
+            <div id="inputRecap"></div>
+          </div>
+
+          <!-- Study order / Weekly Plan -->
+          <div class="result-card" id="orderSection">
+            <div class="rc-title">Weekly Study Plan</div>
+            <div id="orderList" class="order-list"></div>
+            
+            <div id="criticalPathBox" class="critical-path-container" style="display:none">
+              <div class="cp-title">💎 Critical Path</div>
+              <div style="font-size: 13px; color: #94a3b8; margin-bottom: 8px;">Requires the most sequential effort. Start this chain first!</div>
+              <div id="criticalPathContent" class="cp-path"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <script src="planner.js"></script>
+</body>
+</html>
