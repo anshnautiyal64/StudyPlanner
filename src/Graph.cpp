@@ -15,7 +15,7 @@ void Graph::addSubject(const string &name) {
     if (adjacency.find(name) == adjacency.end()) {
         adjacency[name] = unordered_map<string, int>();
         indegree[name] = 0;
-        nodeWeights[name] = 0; // Default weight is 0
+        nodeWeights[name] = 0; 
     }
 }
 
@@ -23,20 +23,17 @@ void Graph::removeSubject(const string &name) {
     if (adjacency.find(name) == adjacency.end()) {
         throw invalid_argument("Subject not found: " + name);
     }
-    
-    // 1. Decrease indegree of all neighbors that 'name' pointed to
+
     for (const auto &neighbor_pair : adjacency[name]) {
         indegree[neighbor_pair.first] -= 1;
     }
     
-    // 2. Remove name from ALL other subjects outgoing edge lists
+
     for (auto &entry : adjacency) {
         if (entry.second.find(name) != entry.second.end()) {
             entry.second.erase(name);
         }
     }
-
-    // 3. Erase name from adjacency, indegree and nodeWeights maps
     adjacency.erase(name);
     indegree.erase(name);
     nodeWeights.erase(name);
@@ -71,7 +68,6 @@ void Graph::setNodeWeight(const string &name, int weight) {
     }
     nodeWeights[name] = weight;
     
-    // Update edge weights internally
     for (auto &entry : adjacency) {
         if (entry.second.find(name) != entry.second.end()) {
             entry.second[name] = weight;
